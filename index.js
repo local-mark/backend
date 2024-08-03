@@ -1,9 +1,10 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require('path');
 const swaggerUi = require("swagger-ui-express");
 const specs = require("./config/swagger.config");
-const { postRouter, postsRouter } = require("./src/routes/post.route");
+const { postsRouter } = require("./src/routes/post.route");
 
 //서버 가동
 dotenv.config();
@@ -15,6 +16,9 @@ app.use(cors()); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함
 app.use(express.urlencoded({ extended: false }));
+
+// 정적 파일 제공
+app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
 
 // swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
