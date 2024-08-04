@@ -5,6 +5,9 @@ const swaggerUi = require("swagger-ui-express");
 const specs = require("./config/swagger.config");
 const { postRouter, postsRouter } = require("./src/routes/post.route");
 
+// import문으로 변경 예정
+import { productRouter } from "./src/routes/product.route.js";
+
 //서버 가동
 dotenv.config();
 const app = express();
@@ -18,6 +21,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+// router setting
+app.use("/products", productRouter);
 
 app.get("/", (req, res) => {
   res.send("로컬마크 시작~");
