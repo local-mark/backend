@@ -28,7 +28,7 @@ export const verifyUser = async (body) => {
 
     const isMatched = await bcrypt.compare(password, user.password);
     if (!isMatched) {
-      conn.realse();
+      conn.release();
       return -2;
     }
 

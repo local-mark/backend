@@ -1,5 +1,6 @@
-import { registerUserService, findUsernameByEmailService, getOrdersService, getOrderItemNumberService, getOrderItemsService, updateUserService, updatePasswordService, updatePasswordEmailService  } from '../services/user.service.js';
+import { registerUserService, findUsernameByEmailService, getOrdersService, getOrderItemNumberService, getOrderItemsService, updateUserService, updatePasswordService, updatePasswordEmailService, resetPassword, deleteUser } from '../services/user.service.js';
 import { response, errResponse } from '../../config/response.js';
+import { status } from "../../config/response.status.js";
 
 export const registerGeneral = async (req, res, next) => {
     try {
@@ -11,6 +12,7 @@ export const registerGeneral = async (req, res, next) => {
         return res.status(400).json(errResponse({ isSuccess: false, code: 400, message: error.message }));
     }
 };
+
 export const registerCreator = async (req, res, next) => {
     try {
         const userData = req.body;
@@ -104,3 +106,22 @@ export const updatePasswordEmail = async (req, res)=>{
     }
 
 }
+
+export const findPassword = async (req, res, next) => {
+    console.log("비밀번호 찾기 요청입니다.");
+
+    const { loginId, email } = req.body;
+    const result = await resetPassword(loginId, email);
+    res.send(response(status.SUCCESS, result));
+};
+
+export const removeUser = async (req, res, next) => {
+    const result = await deleteUser(req.params.userId);
+    if (result == 1) {
+        req.headers["Authorization"] = null;
+        res.clearCookie("refreshToken");
+        res.send(response(status.SUCCESS, "회원 탈퇴가 완료되었습니다."));
+    } else if (result == 2) {
+        res.send(response(status.SUCCESS, "회원 탈퇴 취소가 완료되었습니다."));
+    }
+};

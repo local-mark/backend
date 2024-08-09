@@ -32,8 +32,6 @@ export const jwtMiddleware = async (req, res, next) => {
         jwt.verify(refreshToken, secretKey);
 
         const newAccessToken = await getAccessToken(userInfo.id, refreshToken);
-        console.log("새" + newAccessToken);
-
         res.setHeader("Authorization", `Bearer ${newAccessToken}`);
         req.currentId = userInfo.id;
 

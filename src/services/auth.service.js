@@ -17,26 +17,25 @@ export const userLogin = async (body) => {
   } else if (result == -2) {
     throw new BaseError(status.PASSWORD_NOT_MATCHED);
   }
+  if (result.status == "INACTIVE") {
+    return { userId: result.id, inactiveDate: result.inactive_date }
+  }
 
-  const userId = result.id;
-  const loginId = result.loginId;
-  const type = result.type;
   const secretKey = process.env.JWT_SECRET_KEY || "secret-key";
-
-  const accessToken = jwt.sign({ id: userId, type: type }, secretKey, {
+  const accessToken = jwt.sign({ id: result.id, type: result.type }, secretKey, {
     expiresIn: "1h",
   });
-  const refreshToken = jwt.sign({ id: userId, type: type }, secretKey, {
+  const refreshToken = jwt.sign({ id: result.id, type: result.type }, secretKey, {
     expiresIn: "24h",
   });
 
   // refresh token을 DB에 저장
-  const rows = await updateToken(userId, refreshToken);
+  const rows = await updateToken(result.id, refreshToken);
   if (rows == 0) {
     throw new BaseError(status.TOKEN_UPDATE_FAILED);
   }
 
-  return { loginId, accessToken, refreshToken };
+  return { loginId: result.loginId, accessToken, refreshToken };
 };
 
 export const getAccessToken = async (userId, refreshToken) => {
